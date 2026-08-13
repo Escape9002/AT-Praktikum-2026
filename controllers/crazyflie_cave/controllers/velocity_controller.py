@@ -142,10 +142,20 @@ class VelocityController:
         # rise time 1.5s
         # einregel: 10sec +- 5%
 
+        # Der z_thrust, pitch und roll arbeiten am gleichen Motor
+        # Was heißt, wir können pitch und roll den "saft abdrehen"
+        # in dem unser Wert >> pitch || roll ist.
+        # Pitch/Roll sind zwischen -1.0 und 1.0, eher kleiner.
+        # 
+        # Sichere Werte:
+        # k_p = 0.35
+        # k_d = 0.15/2.0
+        # k_i = 0.8
 
-        k_p = 0.6 # 1.2
-        k_d = 0.15
-        k_i = 1.0
+        # etwas schnellere Werte:
+        k_p = 0.35
+        k_d = 0.15/2.0
+        k_i = 0.9
 
         error_z = vz_ref - vz
 
@@ -153,18 +163,18 @@ class VelocityController:
         self.integral_z += error_z * self.dt
 
         # helps with overshoot, if enabled
-        self.integral_z = np.clip(self.integral_z, -1.0, 1.0)
+        # self.integral_z = np.clip(self.integral_z, -1.0, 1.0)
 
         deriv_z = ( error_z- self.prev_error_z)/self.dt
 
 
-        # print(f'{k_p},{k_d},{k_i}\t\tkp: {error_z * k_p :.3}\t\tkd: {deriv_z * k_d:.3}\t\ti: {self.integral_z:.3}')
+        
 
         z_thrust = (error_z * k_p  +  deriv_z * k_d + self.integral_z * k_i)
-        # print(z_thrust)
 
         thrust_command = z_thrust # placeholder - replace with your controller output
         
+        print(f'{desired_pitch:.3}\t{desired_roll:.3}\t{thrust_command:.3}')
 
         self.prev_error_z = error_z
         #####################################################
@@ -188,6 +198,5 @@ class VelocityController:
         #
         #thrust_command = thrust_command_pid
 
-        print(f'{desired_pitch:.3}\t{desired_roll:.3}\t{thrust_command:.3}')
-
+      
         return desired_roll, desired_pitch, thrust_command

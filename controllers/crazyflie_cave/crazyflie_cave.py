@@ -46,7 +46,7 @@ def main():
 
     # Experiment mode selection
     MODE = "STEP_RESPONSE"   # Options: "TRAJECTORY" or "STEP_RESPONSE"
-    # MODE = "TRAJECTORY"    
+    MODE = "TRAJECTORY"    
     ## Trajectory Tracking
     
     # Reference Trajectory - array of setpoints
