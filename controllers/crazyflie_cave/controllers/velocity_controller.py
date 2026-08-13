@@ -88,30 +88,30 @@ class VelocityController:
         # ============================================================
         # Reference PID implementation (used only for comparison)
 
-        error_z = vz_ref - vz
+        # error_z = vz_ref - vz
 
-        self.integral_z += error_z * self.dt
-        self.integral_z = np.clip(self.integral_z, -2.0, 2.0)
+        # self.integral_z += error_z * self.dt
+        # self.integral_z = np.clip(self.integral_z, -2.0, 2.0)
 
-        deriv_raw = (error_z - self.prev_error_z) / self.dt
+        # deriv_raw = (error_z - self.prev_error_z) / self.dt
 
-        alpha = self.tau_d / (self.tau_d + self.dt)
+        # alpha = self.tau_d / (self.tau_d + self.dt)
 
-        self.deriv_z = (
-            alpha * self.deriv_z
-            + (1.0 - alpha) * deriv_raw
-        )
+        # self.deriv_z = (
+        #     alpha * self.deriv_z
+        #     + (1.0 - alpha) * deriv_raw
+        # )
 
-        deriv_z = self.deriv_z
+        # deriv_z = self.deriv_z
 
-        thrust_command_pid = (
-            self.F_hover
-            + self.Kp_z * error_z
-            + self.Ki_z * self.integral_z
-            + self.Kd_z * deriv_z
-        )
+        # thrust_command_pid = (
+        #     self.F_hover
+        #     + self.Kp_z * error_z
+        #     + self.Ki_z * self.integral_z
+        #     + self.Kd_z * deriv_z
+        # )
 
-        self.prev_error_z = error_z
+        # self.prev_error_z = error_z
 
         # -----------------------------------------------------
         # Aufgabe 2a: Implement your controller by replacing the coefficients with those obtained after by discretization after z-transform.
@@ -130,16 +130,52 @@ class VelocityController:
 
         # Difference equation
         u_z_k = 0 # Placeholder
+
+        #####################################################
+        #####################################################
+         # --- Aufgabe 2a: Vertical velocity controller  ---
+        # Implement a PID or PD controller that outputs thrust_command.
+        z_deadband = 0.01
+        k_p = 2000
+        k_d = 200
+        k_i = 700
+
+        # max overshoot 15%
+        # rise time 1.5s
+        # einregel: 10sec +- 5%
+
+        error_z = vz_ref - vz
+        
+        # if abs(error_z) < z_deadband:
+        #     error_z = 0.0
+
+        self.integral_z += error_z * self.dt
+        self.integral_z = np.clip(self.integral_z, -2.0, 2.0)
+
+        deriv_z = ( error_z- self.prev_error_z)/self.dt
+
+
+        print(f'desired: {vz_ref:.2}\t current: {vz:.5}\t error: {error_z:.5}')
+        z_thrust = error_z * k_p  +  deriv_z * k_d + self.integral_z + self.integral_z * k_i
+        
+        thrust_command = z_thrust # placeholder - replace with your controller output
+        print(self.dt)
+        self.prev_error_z = error_z
+        #####################################################
+        #####################################################
+
+
+
         
         # Control signal - thrust command
-        thrust_command = 0.001 # Placeholder
+#        thrust_command = 0.001 # Placeholder
 
         # Update difference-equation states
         # self.e_z_2 = ...
         # ... Placeholders ...
 
         # Compare PID implementation (thrust_command_pid) with equivalent difference equation (thrust_command).
-        print(f"Difference: {thrust_command_pid - thrust_command:.3e}")
+        #print(f"Difference: {thrust_command_pid - thrust_command:.3e}")
 
         # If you want to actually use the thrust_command_pid output,
         # uncomment this line:
