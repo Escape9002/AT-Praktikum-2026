@@ -43,6 +43,8 @@ class VelocityController:
 
         self.dt = dt
 
+
+
     def compute_control_signals(self, vx_ref, vy_ref, vz_ref, vx, vy, vz):
         """
         Args:
@@ -135,31 +137,35 @@ class VelocityController:
         #####################################################
          # --- Aufgabe 2a: Vertical velocity controller  ---
         # Implement a PID or PD controller that outputs thrust_command.
-        z_deadband = 0.01
-        k_p = 2000
-        k_d = 200
-        k_i = 700
 
         # max overshoot 15%
         # rise time 1.5s
         # einregel: 10sec +- 5%
 
-        error_z = vz_ref - vz
-        
-        # if abs(error_z) < z_deadband:
-        #     error_z = 0.0
 
+        k_p = 1.2 # 1.2
+        k_d = 0.3
+        k_i = 2.0
+
+        error_z = vz_ref - vz
+
+        
         self.integral_z += error_z * self.dt
-        self.integral_z = np.clip(self.integral_z, -2.0, 2.0)
+
+        # helps with overshoot, if enabled
+        self.integral_z = np.clip(self.integral_z, -1.0, 1.0)
 
         deriv_z = ( error_z- self.prev_error_z)/self.dt
 
 
-        print(f'desired: {vz_ref:.2}\t current: {vz:.5}\t error: {error_z:.5}')
-        z_thrust = error_z * k_p  +  deriv_z * k_d + self.integral_z + self.integral_z * k_i
-        
+        # print(f'{k_p},{k_d},{k_i}\t\tkp: {error_z * k_p :.3}\t\tkd: {deriv_z * k_d:.3}\t\ti: {self.integral_z:.3}')
+
+        z_thrust = (error_z * k_p  +  deriv_z * k_d + self.integral_z * k_i)/2
+        # print(z_thrust)
+
         thrust_command = z_thrust # placeholder - replace with your controller output
-        print(self.dt)
+        
+
         self.prev_error_z = error_z
         #####################################################
         #####################################################
@@ -181,5 +187,7 @@ class VelocityController:
         # uncomment this line:
         #
         #thrust_command = thrust_command_pid
+
+        print(f'{desired_pitch:.3}\t{desired_roll:.3}\t{thrust_command:.3}')
 
         return desired_roll, desired_pitch, thrust_command
