@@ -69,9 +69,19 @@ class VelocityController:
         self.prev_error_y = error_y
 
         # --- Aufgabe 2a: Vertical velocity controller  ---
-        # Implement a PID or PD controller that outputs thrust_command.        
+        # Implement a PID or PD controller that outputs thrust_command.
+        z_deadband = 0.01
+        integration_factor = 2.2
+        # should not be the abs, since the sign directly controlls the direction the thrust command
+        error_z = (vz_ref - vz) 
+
+        if abs(error_z) < z_deadband:
+            error_z = 0.0
+
+        print(f'desired: {vz_ref:.2}\t current: {vz:.5}\t error: {error_z:.5}')
+        z_thrust = error_z * integration_factor
         
-        thrust_command = 0.001  # placeholder - replace with your controller output
+        thrust_command = z_thrust # placeholder - replace with your controller output
 
 
 
