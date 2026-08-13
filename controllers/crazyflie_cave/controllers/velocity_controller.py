@@ -143,9 +143,9 @@ class VelocityController:
         # einregel: 10sec +- 5%
 
 
-        k_p = 1.2 # 1.2
-        k_d = 0.3
-        k_i = 2.0
+        k_p = 0.6 # 1.2
+        k_d = 0.15
+        k_i = 1.0
 
         error_z = vz_ref - vz
 
@@ -160,7 +160,7 @@ class VelocityController:
 
         # print(f'{k_p},{k_d},{k_i}\t\tkp: {error_z * k_p :.3}\t\tkd: {deriv_z * k_d:.3}\t\ti: {self.integral_z:.3}')
 
-        z_thrust = (error_z * k_p  +  deriv_z * k_d + self.integral_z * k_i)/2
+        z_thrust = (error_z * k_p  +  deriv_z * k_d + self.integral_z * k_i)
         # print(z_thrust)
 
         thrust_command = z_thrust # placeholder - replace with your controller output
